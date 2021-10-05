@@ -1,4 +1,5 @@
 # Dolphin MOVE SDK Sample App
+Reference: MOVE iOS SDK [documentation](https://docs.movesdk.com/).
 
 A sample application that uses the Dolphin MOVE SDK. 
 This project could be a great starter project for new apps, else AppManager.swift file is a recommended starting point for embedding the SDK in already existing projects.
@@ -32,8 +33,6 @@ Incase your app doesn't use Combine, feel free to replace the `SDKStateMonitor.s
 4. In Configuration.plist file, replace the Bearer value with the product API Key you received.
 5. Clean, build and run the application on your device
 
-Reference: MOVE iOS SDK [documentation](https://docs.movesdk.com/).
-
 ## Starting Point:
 
 ### SDK Setup:
@@ -62,7 +61,7 @@ The SDK  `initialization` API must be executed before the App delegate's method 
 Exceptions might apply, where the SDK is not initialized on app launch.  First initialization is a good example, where the app would only initialize the SDK after onboarding the user and requesting permissions. 
 
 ## Support
-info@dolph.in
+Contact info@dolph.in
  
 ## License
 
