@@ -31,7 +31,8 @@ Incase your app doesn't use Combine, feel free to replace the `SDKStateMonitor.s
 2. Using the terminal, navigate to the project folder and run `pod install`
 3. From finder, open the repository's workspace MoveSDKSample.xcworkspace with Xcode.
 4. In Configuration.plist file, replace the Bearer value with the product API Key you received.
-5. Clean, build and run the application on your device
+5. In Project settings General tab, change the Bundle Identifier to a unique one. 
+6. Clean, build and run the application on your device
 
 ## Starting Point:
 
