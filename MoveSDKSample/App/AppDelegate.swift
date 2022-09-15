@@ -15,9 +15,13 @@
  * /
  */
 
+import BackgroundTasks
 import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+	let backgroundRefreshIdentifier = "in.dolph.sdk.demo.task.refresh"
+	let backgroundRefreshInterval: TimeInterval = 60 * 60 * 4 /// 4h
+
 	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 
 		UINavigationBar.appearance().backgroundColor = UIColor(hue: CGFloat(drand48()), saturation: 1, brightness: 1, alpha: 1)
@@ -30,8 +34,41 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		*/
 		
 		SDKManager.shared.initSDKIfPossible(withOptions: launchOptions)
-		
-		
+
+		registerBackgroundTask(application: application)
+
 		return true
+	}
+
+	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+		completionHandler(.newData)
+	}
+
+	func registerBackgroundTask(application: UIApplication) {
+		if #available(iOS 13.0, *) {
+			BGTaskScheduler.shared.register(forTaskWithIdentifier: backgroundRefreshIdentifier, using: nil) { task in
+				task.setTaskCompleted(success: true)
+				self.scheduleBackgroundFetch(application: application)
+			}
+		}
+
+		scheduleBackgroundFetch(application: application)
+	}
+
+	func scheduleBackgroundFetch(application: UIApplication) {
+		if #available(iOS 13.0, *) {
+			let request = BGAppRefreshTaskRequest(identifier: backgroundRefreshIdentifier)
+			request.earliestBeginDate = Date(timeIntervalSinceNow: backgroundRefreshInterval)
+			do {
+				try BGTaskScheduler.shared.submit(request)
+				print("background refresh scheduled")
+				return
+			} catch {
+				print("Couldn't schedule app refresh \(error.localizedDescription)")
+			}
+		}
+
+		/* fallback for iOS 12 and bellow, or if requesting the task fails */
+		application.setMinimumBackgroundFetchInterval(backgroundRefreshInterval)
 	}
 }
