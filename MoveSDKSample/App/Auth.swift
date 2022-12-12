@@ -22,8 +22,8 @@ struct Auth: Codable {
 
 	let accessToken: String
 	let refreshToken: String
-	let contractId: String
-	let productId: Int
+	let userId: String
+	let projectId: Int
 
 	static func getConfig() -> [String: String] {
 		if let path = Bundle.main.url(forResource: "Configuration", withExtension: "plist"),
@@ -42,13 +42,13 @@ struct Auth: Codable {
 		}
 
 		let session = URLSession.shared
-		let url = URL(string: "https://sdk.dolph.in/sdk-auth/v1_3/jwt/registeruser")
+		let url = URL(string: "https://sdk.dolph.in/v20/auth/register")
 		var request: URLRequest = URLRequest(url: url!)
 
 		request.httpMethod = "POST"
 		request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 		request.addValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
-		request.httpBody = try! JSONSerialization.data(withJSONObject: ["contractId": userID], options: [])
+		request.httpBody = try! JSONSerialization.data(withJSONObject: ["userId": userID], options: [])
 
 		let task = session.dataTask(with: request) { (data, response, error) in
 			if let error = error {
@@ -60,7 +60,7 @@ struct Auth: Codable {
 					print("response: \(text)")
 				}
 				if let obj: Auth = try? JSONDecoder().decode(Auth.self, from: data) {
-					let sdkAuth = MoveAuth(userToken: obj.accessToken, refreshToken: obj.refreshToken, contractID: obj.contractId, productID: Int64(obj.productId))
+					let sdkAuth = MoveAuth(userToken: obj.accessToken, refreshToken: obj.refreshToken, userID: obj.userId, projectID: Int64(obj.projectId))
 					completion(sdkAuth)
 					return
 				}

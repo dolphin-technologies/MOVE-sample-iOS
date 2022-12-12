@@ -22,7 +22,10 @@ import DolphinMoveSDK
 
 class ViewModel: ObservableObject {
 	
-	
+	struct Warning: Hashable {
+		let service: String
+		let reasons: [String]
+	}
 	
 	/// Instance of the SDKStatesMonitor to track SDK states changes
 	@ObservedObject var sdkListeners: SDKStatesMonitor = SDKManager.shared.statesMonitor
@@ -41,10 +44,20 @@ class ViewModel: ObservableObject {
 	
 	/// current error display state
 	@Published var showAlert: Bool = false
-	
+
+	@Published var warnings: [Warning] = []
+
+	@Published var failures: [Warning] = []
+
 	/// Forwards SDKStatesMonitor changes to UI
 	private var sdkStatesListener: AnyCancellable? = nil
-	
+
+	/// Intercept SDK warnings
+	private var sdkWarningsListener: AnyCancellable? = nil
+
+	/// Intercept SDK failures
+	private var sdkFailuresListener: AnyCancellable? = nil
+
 	/// Intercept SDK activation state changes to reflect on UI variables
 	private var sdkActivationStateInterceptor: AnyCancellable? = nil
 	
@@ -54,6 +67,7 @@ class ViewModel: ObservableObject {
 	/// Allows UI to toggle activation state
 	@Published var activationToggle: Bool = SDKManager.shared.isSDKStarted {
 		willSet {
+			print("switching \(activationToggle) -> \(newValue)")
 			if newValue != activationToggle {
 				SDKManager.shared.toggleMoveSDKState()
 			}
@@ -70,30 +84,56 @@ class ViewModel: ObservableObject {
 		}
 		
 		/* Track SDK state to set UI variables */
-		sdkActivationStateInterceptor = sdkListeners.$sdkState.sink(receiveValue: { newValue in
+		sdkActivationStateInterceptor = sdkListeners.$state.sink(receiveValue: { newValue in
 			DispatchQueue.main.async {
 				switch newValue {
 				case .uninitialized, .ready:
 					self.currentStateBGColor1 = Color.stateShutdownBGColor1
 					self.currentStateBGColor2 = Color.stateShutdownBGColor2
-					if !SDKManager.shared.isSDKStarted {
-						self.activationToggle = false
-					}
 				case .running:
 					self.currentStateBGColor1 = Color.stateRunningBGColor1
 					self.currentStateBGColor2 = Color.stateRunningBGColor2
-					self.activationToggle = true
-				case .error:
-					self.currentStateBGColor1 = Color.yellow
-					self.currentStateBGColor2 =  Color.stateNotRunningBGColor2
-					self.activationToggle = true
 				}
 				self.setActivationTitleFor(state: newValue)
 				self.setSDKTitleFor(state: newValue)
 			}
-			
 		})
-		
+
+		sdkWarningsListener = sdkListeners.$warnings.sink {
+			var warnings: [Warning] = []
+			for warning in $0 {
+				let service = warning.service.debugDescription
+				var reasons: [String] = []
+				switch warning.reason {
+				case let .missingPermission(permissions):
+					reasons = permissions.map { "\($0)" }
+				}
+				warnings.append(Warning(service: service, reasons: reasons))
+			}
+			DispatchQueue.main.async {
+				self.warnings = warnings
+			}
+		}
+
+		sdkFailuresListener = sdkListeners.$failures.sink {
+			var warnings: [Warning] = []
+			for warning in $0 {
+				let service = warning.service.debugDescription
+				var reasons: [String] = []
+				switch warning.reason {
+				case let .missingPermission(permissions):
+					reasons = permissions.map { "\($0)" }
+				case .unauthorized:
+					reasons = ["unauthorized"]
+				}
+				warnings.append(Warning(service: service, reasons: reasons))
+			}
+			DispatchQueue.main.async {
+				self.failures = warnings
+			}
+		}
+
+
 		/* Track error to set UI toast alert  */
 		errorsInterceptor = sdkListeners.$alertError.sink(receiveValue: { newValue in
 			DispatchQueue.main.async {
@@ -109,30 +149,26 @@ class ViewModel: ObservableObject {
 			self.title = "NOT RECORDING"
 		case .running:
 			self.title = "RECORDING"
-		case .error:
-			self.title = "ERROR"
 		}
 	}
 	
 	/// Sets ActivationView title based on passed MoveSDKState
 	func setSDKTitleFor(state: MoveSDKState) {
-		switch state {
-		case .uninitialized, .ready, .running:
-			self.currentSDKStateLabel = "\(state)"
-		case let .error(e):
-			switch e {
-			
-			case .locationPermMissingException:
-				self.currentSDKStateLabel = "error: location permission missing"
-			case .locationPermPrecisionException:
-				self.currentSDKStateLabel = "error: location precision missing"
-			case .motionPermMissingException:
-				self.currentSDKStateLabel = "error: motion permission missing"
-			case .sensorsInvalidException:
-				self.currentSDKStateLabel = "error: sensors missing"
-			@unknown default:
-				break
-			}
+		self.currentSDKStateLabel = "\(state)"
+	}
+
+	func string(permission: MovePermission) -> String {
+		switch permission {
+		case .location:
+			return "location permission missing"
+		case .backgroundLocation:
+			return "background location missing"
+		case .preciseLocation:
+			return "location precision missing"
+		case .motionActivity:
+			return "motion permission missing"
+		default:
+			return "sensors missing"
 		}
 	}
 }
@@ -143,8 +179,8 @@ extension Color {
 
 	static var stateNotRunningBGColor1 = Color(r: 255, g: 255, b: 136)
 	static var stateNotRunningBGColor2 = Color(r: 255, g: 250, b: 187)
-	
+	static var stateNotRunningBGColor3 = Color(r: 255, g: 187, b: 136)
+
 	static var stateShutdownBGColor1 = Color(r: 243, g: 80, b: 94)
 	static var stateShutdownBGColor2 = Color(r: 160, g: 5, b: 28)
-
 }

@@ -28,7 +28,7 @@ class SDKManager {
 	
 	/// SDK state UI observer
 	let statesMonitor = SDKStatesMonitor()
-	
+
 	/**
 	SDK activation state
 	
@@ -40,7 +40,7 @@ class SDKManager {
 	In this app, this state will be set from toggling in the UI the SDK activation toggle switch.
 	*/
 	var isSDKStarted: Bool = false {
-		didSet{
+		didSet {
 			/* persist state*/
 			UserDefaults.standard.set(isSDKStarted, forKey: "isSDKStarted")
 		}
@@ -65,7 +65,7 @@ class SDKManager {
 		/* Decode possibly persisted user auth */
 		if let data: Data = UserDefaults.standard.object(forKey: "auth") as? Data {
 			auth = try? decoder.decode(MoveAuth.self, from: data)
-			if let contractID = auth?.contractID {
+			if let contractID = auth?.userID {
 				statesMonitor.set(contractID: contractID)
 			}
 		}
@@ -82,43 +82,50 @@ class SDKManager {
 	- A persisted MoveAuth exists
 	- SDK activation state is set to activated.
 	*/
-	func initSDKIfPossible(withOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) {
-		if let auth = auth {
-			initializeSDK(auth: auth, launchOptions: options)
-		}
+	func initSDK(withOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) {
+		/* 1. setup listeners for the SDK callbacks */
+		moveSDK.setLogListener(sdkLogListener)
+		moveSDK.setAuthStateUpdateListener(sdkAuthStateListener)
+		moveSDK.setServiceWarningListener(sdkWarningListener)
+		moveSDK.setServiceFailureListener(sdkFailureListener)
+		moveSDK.setSDKStateListener(sdkStateListener)
+		moveSDK.setTripStateListener(sdkTripStateListener)
+		moveSDK.initialize(launchOptions: options)
 	}
 
 	/// Toggles MOVE SDK Activation State
 	func toggleMoveSDKState() {
-		
-		/* Toggle SDK State */
-		isSDKStarted = !isSDKStarted
-		
+
 		/* Switch on latest state to determine the action */
 		switch moveSDK.getSDKState() {
 		case .uninitialized:
 			registerUserIfNeeded { auth in
 				if let auth = auth {
 					self.initializeSDK(auth: auth)
+					self.moveSDK.startAutomaticDetection()
+					self.isSDKStarted = true
 				}
 				else {
 					
 					/* Inform the monitor with the errors*/
 					self.statesMonitor.set(alert: .networkError)
-					
-					/* revert isSDKStarted user setting on registration failure */
-					self.isSDKStarted = false
-					self.statesMonitor.sdkState = .uninitialized
+
+					self.statesMonitor.state = .uninitialized
 				}
 			}
 		case .running:
 			/* Toggle back from running to ready */
 			moveSDK.stopAutomaticDetection()
+			self.isSDKStarted = false
 		case .ready:
 			/* Toggle to running the SDK services */
 			moveSDK.startAutomaticDetection()
-		default: break
+			self.isSDKStarted = true
 		}
+	}
+
+	func resolveErrors() {
+		moveSDK.resolveSDKStateError()
 	}
 
 	/// Registers a user if not already registered.
@@ -160,37 +167,20 @@ class SDKManager {
 	 3. initialize the SDK's shared instance using `initialize` API
 	*/
 	func initializeSDK(auth: MoveAuth, launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) {
-		
-		/* 1. setup listeners for the SDK callbacks */
-		moveSDK.setLogListener(sdkLogListener)
-		moveSDK.setAuthStateUpdateListener(sdkAuthStateListener)
-		moveSDK.setSDKStateListener(sdkStateListener)
-		moveSDK.setTripStateListener(sdkTripStateListener)
 
 		/* 2.  setup config for allowed SDK services.
 		N.B: Requesting services which are not active on the licensed endpoint will result in config mismatch */
-		let config = MoveConfig(timelineDetectionService: [.driving, .bicycle, .walking, .places, .publicTransport], drivingServices: [.dfd, .behaviour], walkingServices: [.location], otherServices: [.poi])
+		let config = MoveConfig(detectionService: [.driving([.drivingBehavior, .distractionFreeDriving]), .cycling, .walking([.location]), .places, .publicTransport, .pointsOfInterest])
 
 		/* 3. Initialize the SDK's shared instance */
-		moveSDK.initialize(auth: auth, config: config, launchOptions: launchOptions) { error in
-			DispatchQueue.main.async {
-				if let error = error {
-					
-					/* revert isSDKStarted user setting on start failure */
-					self.isSDKStarted = false
-				
-					/* config mismatch or network/gateway errors */
-					switch error {
-					case .configMismatch:
-						self.statesMonitor.set(alert: .configError)
-					case .serviceUnreachable:
-						self.statesMonitor.set(alert: .networkError)
-					default:
-						break
-					}
-				}
-				
-			}
+		moveSDK.setup(auth: auth, config: config)
+	}
+
+	/// Triggers the SDK internal upload queue and reports network errors on failure
+	func performFetch(completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+		moveSDK.performBackgroundFetch { result in
+			print("processed background fetch \(result)")
+			completionHandler(result)
 		}
 	}
 }
@@ -202,9 +192,25 @@ extension SDKManager {
 	Monitors MOVE SDK generated logs.
 	Host apps could append those logs to his app analytics or logging tools.
 	*/
-	func sdkLogListener(_ text: String) {
+	func sdkLogListener(_ text: String, _ value: String?) {
 		DispatchQueue.main.async {
 			self.statesMonitor.logMessage = text
+		}
+	}
+
+	/// Monitors MOVE SDK Serrvice Warnings
+	func sdkWarningListener(_ warnings: [MoveServiceWarning]) {
+		DispatchQueue.main.async {
+			print("warnings: \(warnings)")
+			self.statesMonitor.warnings = warnings
+		}
+	}
+
+	/// Monitors MOVE SDK Serrvice Failures
+	func sdkFailureListener(_ failures: [MoveServiceFailure]) {
+		DispatchQueue.main.async {
+			print("failures: \(failures)")
+			self.statesMonitor.failures = failures
 		}
 	}
 
@@ -215,16 +221,10 @@ extension SDKManager {
 		}
 
 		switch state {
-		case let .valid(auth):
-			/* store the newly refreshed MOVEAuth to use on next init */
-			self.auth = auth
 		case .expired:
 			/* the SDK Failed to refresh the current MOVEAuth and needs a new MOVEAuth key */
 			self.fetchAndUpdateSDKAuth()
-		case .unknown:
-			/* initial state, ignore */
-			break
-		@unknown default:
+		default:
 			break
 		}
 	}
@@ -233,20 +233,7 @@ extension SDKManager {
 	func sdkStateListener(_ state: MoveSDKState) {
 		/* the SDK state listener handles changes in the SDK state machine */
 		DispatchQueue.main.async {
-			self.statesMonitor.sdkState = state
-		}
-
-		switch state {
-		case .running, .uninitialized: break
-		case .ready:
-			/* skip ready state and start service if it was not transiting from running state */
-			if isSDKStarted {
-				self.moveSDK.startAutomaticDetection()
-			}
-		case .error:
-			/* the app needs to handle permission errors, which requires user interaction */
-			/* the SDK should go back to '.ready' state once these are resolved */
-			break
+			self.statesMonitor.state = state
 		}
 	}
 
@@ -275,7 +262,7 @@ extension SDKManager {
 		guard let auth = auth else { return }
 
 		/* to get new refresh/access token use register function */
-		Auth.registerSDKUser(userID: auth.contractID) { auth in
+		Auth.registerSDKUser(userID: auth.userID) { auth in
 			if let auth = auth {
 				self.auth = auth
 				self.moveSDK.update(auth: auth) { error in
@@ -289,6 +276,22 @@ extension SDKManager {
 			} else {
 				/* the app is responsible for further error handling as of here */
 				/* retry or notify user ... */
+			}
+		}
+	}
+
+	func fetchSDKAuth(callback: @escaping(MoveAuth?)->Void) {
+		guard let auth = auth else { return }
+
+		/* to get new refresh/access token use register function */
+		Auth.registerSDKUser(userID: auth.userID) { auth in
+			if let auth = auth {
+				self.auth = auth
+				callback(auth)
+			} else {
+				/* the app is responsible for further error handling as of here */
+				/* retry or notify user ... */
+				callback(nil)
 			}
 		}
 	}

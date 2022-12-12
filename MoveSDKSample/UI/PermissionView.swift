@@ -30,7 +30,6 @@ struct PermissionView: View {
 			Text("MOVE needs the following permissions to record your activities. Please check each one and grant them.")
 				.fixedSize(horizontal: false, vertical: true)
 				.padding(.horizontal)
-				.padding(.vertical, 2)
 				.foregroundColor(.black).opacity(0.7)
 				.font(.footnote)
 

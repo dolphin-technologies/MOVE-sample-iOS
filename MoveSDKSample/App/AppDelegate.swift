@@ -19,13 +19,10 @@ import BackgroundTasks
 import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-	let backgroundRefreshIdentifier = "in.dolph.sdk.demo.task.refresh"
+	let backgroundRefreshIdentifier = "in.dolph.sdk.test.task.refresh"
 	let backgroundRefreshInterval: TimeInterval = 60 * 60 * 4 /// 4h
 
 	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-
-		UINavigationBar.appearance().backgroundColor = UIColor(hue: CGFloat(drand48()), saturation: 1, brightness: 1, alpha: 1)
-			//UIColor(red: 7, green: 18, blue: 48, alpha: 1.0)
 
 		/*
 		The initializationAPI must be executed before didFinishLaunchingWithOptionsreturns. We recommend calling it in willFinishLaunchingWithOptions .
@@ -33,42 +30,47 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		Exceptions might apply, where the SDK is not initialized on app launch.  First initialization is a good example, where the app would only initialize the SDK after onboarding the user and requesting permissions.
 		*/
 		
-		SDKManager.shared.initSDKIfPossible(withOptions: launchOptions)
-
-		registerBackgroundTask(application: application)
-
+		SDKManager.shared.initSDK(withOptions: launchOptions)
+		
 		return true
 	}
 
-	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-		completionHandler(.newData)
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+		registerBackgroundTask(application: application)
+		return true
 	}
 
 	func registerBackgroundTask(application: UIApplication) {
-		if #available(iOS 13.0, *) {
-			BGTaskScheduler.shared.register(forTaskWithIdentifier: backgroundRefreshIdentifier, using: nil) { task in
-				task.setTaskCompleted(success: true)
-				self.scheduleBackgroundFetch(application: application)
+		BGTaskScheduler.shared.register(forTaskWithIdentifier: backgroundRefreshIdentifier, using: nil) { task in
+			SDKManager.shared.performFetch { result in
+				task.setTaskCompleted(success: result != .failed)
 			}
+			self.scheduleBackgroundFetch(application: application)
 		}
 
 		scheduleBackgroundFetch(application: application)
+
+#if targetEnvironment(simulator)
+		/// Fallback to old background fetch implementation
+		application.setMinimumBackgroundFetchInterval(backgroundRefreshInterval)
+#endif
 	}
 
 	func scheduleBackgroundFetch(application: UIApplication) {
-		if #available(iOS 13.0, *) {
-			let request = BGAppRefreshTaskRequest(identifier: backgroundRefreshIdentifier)
-			request.earliestBeginDate = Date(timeIntervalSinceNow: backgroundRefreshInterval)
-			do {
-				try BGTaskScheduler.shared.submit(request)
-				print("background refresh scheduled")
-				return
-			} catch {
-				print("Couldn't schedule app refresh \(error.localizedDescription)")
-			}
+		let request = BGAppRefreshTaskRequest(identifier: backgroundRefreshIdentifier)
+		request.earliestBeginDate = Date(timeIntervalSinceNow: backgroundRefreshInterval)
+		do {
+			try BGTaskScheduler.shared.submit(request)
+			print("background refresh scheduled")
+			return
+		} catch {
+			print("Couldn't schedule app refresh \(error.localizedDescription)")
 		}
+	}
 
-		/* fallback for iOS 12 and bellow, or if requesting the task fails */
-		application.setMinimumBackgroundFetchInterval(backgroundRefreshInterval)
+	/// Fallback to old background fetch implementation
+	func application(_: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+		SDKManager.shared.performFetch(completionHandler: completionHandler)
 	}
 }
+

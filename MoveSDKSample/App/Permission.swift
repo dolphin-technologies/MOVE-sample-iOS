@@ -92,10 +92,10 @@ class LocationPermission: Permission {
 			isGranted = false
 			isDisabled = true
 		case .authorizedAlways:
-			isGranted = true
+			isGranted = isPrecise
 			isDisabled = true
 		case .authorizedWhenInUse:
-			isGranted = true
+			isGranted = isPrecise
 			isDisabled = true
 		@unknown default:
 			isGranted = false
@@ -137,23 +137,20 @@ class MotionPermission: Permission {
 		UserDefaults.standard.set(isPermissionRequested, forKey: isPermissionRequestedKey)
 		requestMotionPermission() { status in
 			self.get(status: status)
+			SDKManager.shared.resolveErrors()
 		}
 	}
 
 	private func requestMotionPermission(_ completion: ((_ result: CMAuthorizationStatus) -> Void)? = nil) {
 
-		motionManager.queryActivityStarting(from: Date(), to: Date(), to: OperationQueue.main) { _, error in			
-			if let _ = error {
-				
-				//TODO: handle simulator case
+		motionManager.queryActivityStarting(from: Date(), to: Date(), to: OperationQueue.main) { _, error in
+			if error != nil {
 				/* Check if permission is granted on simulator to bypass sensors not available error .*/
-//				let cmError = CMError(rawValue: UInt32((error as NSError).code))
-//				if cmError == CMErrorMotionActivityNotAvailable {
-//					completion?(CMAuthorizationStatus.authorized)
-//				}
-//				else {
-					completion?(CMAuthorizationStatus.denied)
-				//}
+#if targetEnvironment(simulator)
+				completion?(CMMotionActivityManager.authorizationStatus())
+#else
+				completion?(CMAuthorizationStatus.denied)
+#endif
 			}
 			else {
 				completion?(CMAuthorizationStatus.authorized)

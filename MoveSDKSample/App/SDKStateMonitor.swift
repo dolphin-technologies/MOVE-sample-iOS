@@ -30,8 +30,8 @@ class SDKStatesMonitor: ObservableObject {
 	@Published var logMessage: String = "-"
 	
 	/// Reflects SDK state
-	@Published var sdkState: MoveSDKState = .uninitialized
-	
+	@Published var state: MoveSDKState = .uninitialized
+
 	/// Reflects SDK trip state
 	@Published var tripState: String = "-"
 	
@@ -46,6 +46,12 @@ class SDKStatesMonitor: ObservableObject {
 	
 	/// Reflect error messages from SDKManager or the SDK itself.
 	@Published var alertError: String = ""
+
+	/// Reflects SDK Warnings
+	@Published var warnings: [MoveServiceWarning] = []
+
+	/// Reflects SDK Failures
+	@Published var failures: [MoveServiceFailure] = []
 
 	func set(alert: AlertError) {
 		alertError = alert.rawValue

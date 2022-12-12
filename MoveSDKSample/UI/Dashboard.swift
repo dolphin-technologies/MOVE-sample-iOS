@@ -38,23 +38,24 @@ struct Dashboard: View {
 		appearance.backgroundColor = UIColor(red: 7.0/255.0, green: 18.0/255.0, blue: 48.0/255.0, alpha: 1.0)
 		appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
 		UINavigationBar.appearance().standardAppearance = appearance
+		UINavigationBar.appearance().scrollEdgeAppearance = appearance
 	}
 
 
 	var body: some View {
 		NavigationView {
+			VStack(alignment: .leading) {
+				ActivationView(viewModel: viewModel).frame(height: 167.715)
 			GeometryReader { reader in
-				ScrollView() {
-
-					VStack(alignment: .leading) {
-
-						ActivationView(viewModel: viewModel)
-						PermissionView(locationPermission: locationPermission, motionPermission: motionPermission)
-						StateView(states: [StateLabel(title: "SDK STATE:", value: $viewModel.currentSDKStateLabel), StateLabel(title: "SDK TRIP STATE:", value: $viewModel.sdkListeners.tripState),  StateLabel(title: "SDK AUTH STATE:", value: $viewModel.sdkListeners.authState)])
+					ScrollView() {
+						VStack(alignment: .leading) {
+							WarningsView(viewModel: viewModel)
+							PermissionView(locationPermission: locationPermission, motionPermission: motionPermission)
+							StateView(states: [StateLabel(title: "SDK STATE:", value: $viewModel.currentSDKStateLabel), StateLabel(title: "SDK TRIP STATE:", value: $viewModel.sdkListeners.tripState),  StateLabel(title: "SDK AUTH STATE:", value: $viewModel.sdkListeners.authState)])
+						}
+//						.frame(height: reader.size.height)
 					}
-					.frame(height: reader.size.height)
 				}
-
 			}
 			.ignoresSafeArea(.all, edges: .bottom)
 			.navigationBarTitle("MOVE.", displayMode: .inline)

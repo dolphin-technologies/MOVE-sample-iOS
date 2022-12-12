@@ -16,32 +16,33 @@
  */
 
 import SwiftUI
+import DolphinMoveSDK
 
-struct ActivationView: View {
+struct WarningsView: View {
 	@StateObject var viewModel: ViewModel
 
-    var body: some View {
-		VStack {
-			ZStack {
-				LinearGradient(gradient: Gradient(colors: [viewModel.currentStateBGColor1, viewModel.currentStateBGColor2]), startPoint: .top, endPoint: .bottom)
+	var body: some View {
+		VStack(alignment: .leading) {
+			ForEach(viewModel.failures, id: \.self) { warning in
 				VStack(alignment: .leading) {
-					Text("CURRENT STATE")
-						.font(.headline)
-						.fontWeight(.heavy)
-						.foregroundColor(.white)
-						.padding([.horizontal])
-						.padding(.bottom, 5)
-
-					CellView(toggle: $viewModel.activationToggle, disabled: .constant(false), title: viewModel.title, description: viewModel.sdkListeners.contractID)
+					Text(warning.service)
+					Text(warning.reasons.joined(separator: ", "))
 				}
-				.padding(.vertical)
+				.foregroundColor(.red)
+				.font(.footnote.weight(.bold))
+				.padding(.vertical, 2)
+				.padding(.horizontal)
+			}
+			ForEach(viewModel.warnings, id: \.self) { warning in
+				VStack(alignment: .leading) {
+					Text(warning.service)
+					Text(warning.reasons.joined(separator: ", "))
+				}
+				.foregroundColor(.yellow)
+				.font(.footnote.weight(.bold))
+				.padding(.vertical, 2)
+				.padding(.horizontal)
 			}
 		}
-	}
-}
-
-struct ActivationView_Previews: PreviewProvider {
-    static var previews: some View {
-		ActivationView(viewModel: ViewModel())
     }
 }
