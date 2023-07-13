@@ -1,12 +1,12 @@
 PODS:
   - Alamofire (5.5.0)
   - AlertToast (1.3.7)
-  - DolphinMoveSDK (2.0.0.223)
+  - DolphinMoveSDK (2.3.4.250)
 
 DEPENDENCIES:
   - Alamofire (~> 5)
   - AlertToast
-  - DolphinMoveSDK (~> 2.0.0)
+  - DolphinMoveSDK (~> 2.3.4)
 
 SPEC REPOS:
   trunk:
@@ -17,8 +17,8 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   Alamofire: 1c4fb5369c3fe93d2857c780d8bbe09f06f97e7c
   AlertToast: 8c9d5efb2df6ea728b32b62bce99d876ec3e5393
-  DolphinMoveSDK: 93db67a2e407eff2060366c543274b4911b2cd45
+  DolphinMoveSDK: 9445496b026076acab222482ba9152cc8e7ae8e2
 
-PODFILE CHECKSUM: 300c47efdb35dd20fe1d69b354bae6309b196600
+PODFILE CHECKSUM: f80d3c944a8b94b27b09635b47bcca780c9aa537
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

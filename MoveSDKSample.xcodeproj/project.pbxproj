@@ -23,6 +23,7 @@
 		AB79491226A06E1200BDC39C /* Permission.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB79491126A06E1200BDC39C /* Permission.swift */; };
 		AB79491E26A1730400BDC39C /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB79491D26A1730400BDC39C /* Auth.swift */; };
 		AB79492026A17E7800BDC39C /* Configuration.plist in Resources */ = {isa = PBXBuildFile; fileRef = AB79491F26A17E7800BDC39C /* Configuration.plist */; };
+		ABBD33A22A5FF54A008F809A /* WarningsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD33A12A5FF54A008F809A /* WarningsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,7 @@
 		AB79491126A06E1200BDC39C /* Permission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permission.swift; sourceTree = "<group>"; };
 		AB79491D26A1730400BDC39C /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		AB79491F26A17E7800BDC39C /* Configuration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Configuration.plist; sourceTree = "<group>"; };
+		ABBD33A12A5FF54A008F809A /* WarningsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarningsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,13 +115,14 @@
 		AB79490A269F077C00BDC39C /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				1B5124D326F90447009BB02B /* ViewModel.swift */,
-				AB36BE46269F052B005A6AD2 /* MoveSDKSampleApp.swift */,
-				AB36BE48269F052B005A6AD2 /* Dashboard.swift */,
-				AB79490F269F0DFB00BDC39C /* PermissionView.swift */,
-				1BC1818526E10ABD00B412B9 /* StateView.swift */,
 				1BC1818326E109B900B412B9 /* ActivationView.swift */,
 				1BC1818726E10CC400B412B9 /* CellView.swift */,
+				AB36BE48269F052B005A6AD2 /* Dashboard.swift */,
+				AB36BE46269F052B005A6AD2 /* MoveSDKSampleApp.swift */,
+				AB79490F269F0DFB00BDC39C /* PermissionView.swift */,
+				1BC1818526E10ABD00B412B9 /* StateView.swift */,
+				1B5124D326F90447009BB02B /* ViewModel.swift */,
+				ABBD33A12A5FF54A008F809A /* WarningsView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -128,9 +131,9 @@
 			isa = PBXGroup;
 			children = (
 				AB794908269F06C100BDC39C /* AppDelegate.swift */,
-				AB79490D269F093D00BDC39C /* SDKManager.swift */,
-				AB79491126A06E1200BDC39C /* Permission.swift */,
 				AB79491D26A1730400BDC39C /* Auth.swift */,
+				AB79491126A06E1200BDC39C /* Permission.swift */,
+				AB79490D269F093D00BDC39C /* SDKManager.swift */,
 				1BA9D75026B183D3002297CF /* SDKStateMonitor.swift */,
 			);
 			path = App;
@@ -269,6 +272,7 @@
 			files = (
 				1BC1818826E10CC400B412B9 /* CellView.swift in Sources */,
 				AB794910269F0DFB00BDC39C /* PermissionView.swift in Sources */,
+				ABBD33A22A5FF54A008F809A /* WarningsView.swift in Sources */,
 				1BC1818626E10ABD00B412B9 /* StateView.swift in Sources */,
 				AB794909269F06C200BDC39C /* AppDelegate.swift in Sources */,
 				AB79491226A06E1200BDC39C /* Permission.swift in Sources */,
@@ -409,6 +413,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MoveSDKSample/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = MoveSDKSample/Info.plist;
@@ -417,6 +422,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dolphin.move.MoveSDKSample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -431,6 +437,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MoveSDKSample/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = MoveSDKSample/Info.plist;
@@ -439,6 +446,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dolphin.move.MoveSDKSample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
