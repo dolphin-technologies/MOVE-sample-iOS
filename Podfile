@@ -11,7 +11,7 @@ target 'MoveSDKSample' do
 	pod 'AlertToast'
 
 	#	Dolphin Pods
-	pod 'DolphinMoveSDK', '~> 2.3.4'
+	pod 'DolphinMoveSDK', '~> 2.4.0'
 
 end
 
