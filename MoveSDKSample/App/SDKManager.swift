@@ -99,17 +99,15 @@ class SDKManager {
 		/* Switch on latest state to determine the action */
 		switch moveSDK.getSDKState() {
 		case .uninitialized:
-			registerUserIfNeeded { auth in
-				if let auth = auth {
+			registerUserIfNeeded { result in
+				switch result {
+				case let .success(auth):
 					self.initializeSDK(auth: auth)
 					self.moveSDK.startAutomaticDetection()
 					self.isSDKStarted = true
-				}
-				else {
-					
+				case let .failure(error):
 					/* Inform the monitor with the errors*/
-					self.statesMonitor.set(alert: .networkError)
-
+					self.statesMonitor.set(alert: error)
 					self.statesMonitor.state = .uninitialized
 				}
 			}
@@ -129,28 +127,27 @@ class SDKManager {
 	}
 
 	/// Registers a user if not already registered.
-	func registerUserIfNeeded(completion: @escaping (MoveAuth?)->()){
+	func registerUserIfNeeded(completion: @escaping (Result<MoveAuth, Error>)->()){
 		if let auth = auth {
-			completion(auth)
+			completion(.success(auth))
 		} else {
 			/* create a random 7 digits user id*/
 			let userID = Int(Date().timeIntervalSince1970).description.prefix(10).description
 	
 			/* register user and fetch token*/
-			Auth.registerSDKUser(userID: userID) { auth in
-				if let auth = auth {
+			Auth.registerSDKUser(userID: userID) { result in
+				switch result {
+				case let .success(auth):
 					/* update state monitor with new id for UI*/
 					self.statesMonitor.set(contractID: userID)
-					
+
 					self.auth = auth
-					DispatchQueue.main.async {
-						completion(auth)
-					}
+				case .failure(_):
+					break
 				}
-				else {
-					DispatchQueue.main.async {
-						completion(nil)
-					}
+
+				DispatchQueue.main.async {
+					completion(result)
 				}
 			}
 		}
@@ -221,9 +218,9 @@ extension SDKManager {
 		}
 
 		switch state {
-		case .expired:
-			/* the SDK Failed to refresh the current MOVEAuth and needs a new MOVEAuth key */
-			self.fetchAndUpdateSDKAuth()
+		case .invalid:
+			/* the SDK Failed to refresh the current MOVEAuth because it was invalidated */
+			self.moveSDK.shutDown()
 		default:
 			break
 		}
@@ -243,56 +240,6 @@ extension SDKManager {
 		/* idle, driving */
 		DispatchQueue.main.async {
 			self.statesMonitor.tripState = "\(state)"
-		}
-	}
-}
-
-//MARK:- Authorization
-extension SDKManager {
-	/**
-	Refetch new SDK Auth object and update the SDK.
-	
-	# Tasks
-	
-	 1. fetch new SDK Auth
-	 2. persist it
-	 3. update the SDK with the new Auth using`update(auth: MoveAuth)` API
-	*/
-	func fetchAndUpdateSDKAuth() {
-		guard let auth = auth else { return }
-
-		/* to get new refresh/access token use register function */
-		Auth.registerSDKUser(userID: auth.userID) { auth in
-			if let auth = auth {
-				self.auth = auth
-				self.moveSDK.update(auth: auth) { error in
-					if let error = error {
-						print("\(error)")
-						/* the app is responsible for further error handling as of here */
-						/* maybe config mismatched */
-						/* retry or notify user ... */
-					}
-				}
-			} else {
-				/* the app is responsible for further error handling as of here */
-				/* retry or notify user ... */
-			}
-		}
-	}
-
-	func fetchSDKAuth(callback: @escaping(MoveAuth?)->Void) {
-		guard let auth = auth else { return }
-
-		/* to get new refresh/access token use register function */
-		Auth.registerSDKUser(userID: auth.userID) { auth in
-			if let auth = auth {
-				self.auth = auth
-				callback(auth)
-			} else {
-				/* the app is responsible for further error handling as of here */
-				/* retry or notify user ... */
-				callback(nil)
-			}
 		}
 	}
 }

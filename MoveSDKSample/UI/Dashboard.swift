@@ -61,7 +61,7 @@ struct Dashboard: View {
 			.navigationBarTitle("MOVE.", displayMode: .inline)
 		}
 		.toast(isPresenting: $viewModel.showAlert) {
-			AlertToast(type: .error(.red), title: viewModel.sdkListeners.alertError)
+			AlertToast(displayMode: .hud, type: .error(.red), title: "Error", subTitle: viewModel.sdkListeners.alertError)
 		}
 	}
 }
