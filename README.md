@@ -27,7 +27,7 @@ Incase your app doesn't use Combine, feel free to replace the `SDKStateMonitor.s
 
 ## To run this project:
 
-1. Request a product API Key by contacting Dolphin MOVE.
+1. Obtain an API Key from the [Move Dashboard](https://dashboard.movesdk.com/admin/sdkConfig/keys).
 2. Using the terminal, navigate to the project folder and run `pod install`
 3. From finder, open the repository's workspace MoveSDKSample.xcworkspace with Xcode.
 4. In Configuration.plist file, replace the Bearer value with the product API Key you received.

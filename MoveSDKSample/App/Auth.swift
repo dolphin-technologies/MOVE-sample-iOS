@@ -49,8 +49,11 @@ struct Auth: Codable {
 
 	static func registerSDKUser(userID: String, completion: @escaping((Result<MoveAuth, Error>)->())) {
 		guard let bearer = getConfig()["Bearer"], !bearer.isEmpty else {
-			/* bearer is the api key for the sdk */
-			completion(.failure(AuthError.configError("Missing Bearer. Add API key in 'Configuration.plist'.")))
+			/* Bearer is the API key for authenticating with the the Move SDK.
+			 * You must add the API key in 'Configuration.plist'
+			 * The API key is obtained from the MOVE Dashboard. https://dashboard.movesdk.com/admin/sdkConfig/keys
+			 */
+			completion(.failure(AuthError.configError("Missing API key.\nSee 'README.md'.")))
 			return
 		}
 
