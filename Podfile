@@ -11,7 +11,7 @@ target 'MoveSDKSample' do
 	pod 'AlertToast'
 
 	#	Dolphin Pods
-	pod 'DolphinMoveSDK', '~> 2.4.0'
+	pod 'DolphinMoveSDK', '~> 2.6.4'
 
 end
 
@@ -24,3 +24,11 @@ end
 #		end
 #	end
 #end
+
+post_install do |installer|
+	installer.pods_project.targets.each do |target|
+		target.build_configurations.each do |config|
+			config.build_settings.delete "IPHONEOS_DEPLOYMENT_TARGET"
+		end
+	end
+end

@@ -67,7 +67,6 @@ class ViewModel: ObservableObject {
 	/// Allows UI to toggle activation state
 	@Published var activationToggle: Bool = SDKManager.shared.isSDKStarted {
 		willSet {
-			print("switching \(activationToggle) -> \(newValue)")
 			if newValue != activationToggle {
 				SDKManager.shared.toggleMoveSDKState()
 			}

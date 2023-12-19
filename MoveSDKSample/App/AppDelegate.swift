@@ -61,10 +61,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		request.earliestBeginDate = Date(timeIntervalSinceNow: backgroundRefreshInterval)
 		do {
 			try BGTaskScheduler.shared.submit(request)
-			print("background refresh scheduled")
+			print("Background refresh scheduled.")
 			return
 		} catch {
-			print("Couldn't schedule app refresh \(error.localizedDescription)")
+#if targetEnvironment(simulator)
+			print("Can't schedule background fetch on simulator.")
+#else
+			print("Couldn't schedule background fetch, ERROR: \(error.localizedDescription).")
+#endif
 		}
 	}
 

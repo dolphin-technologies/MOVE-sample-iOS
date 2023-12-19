@@ -18,8 +18,21 @@
 import Foundation
 import DolphinMoveSDK
 
-struct Auth: Codable {
+enum AuthError: Error, LocalizedError {
+	case configError(String)
+	case networkError(String)
 
+	public var errorDescription: String? {
+		switch self {
+		case let .configError(text):
+			return "\(text)"
+		case let .networkError(text):
+			return "Network Error: '\(text)'."
+		}
+	}
+}
+
+struct Auth: Codable {
 	let accessToken: String
 	let refreshToken: String
 	let userId: String
@@ -34,10 +47,13 @@ struct Auth: Codable {
 		return [:]
 	}
 
-	static func registerSDKUser(userID: String, completion: @escaping((MoveAuth?)->())) {
-		guard let bearer = getConfig()["Bearer"] else {
-			/* bearer is the api key for the sdk */
-			completion(nil)
+	static func registerSDKUser(userID: String, completion: @escaping((Result<MoveAuth, Error>)->())) {
+		guard let bearer = getConfig()["Bearer"], !bearer.isEmpty else {
+			/* Bearer is the API key for authenticating with the the Move SDK.
+			 * You must add the API key in 'Configuration.plist'
+			 * The API key is obtained from the MOVE Dashboard. https://dashboard.movesdk.com/admin/sdkConfig/keys
+			 */
+			completion(.failure(AuthError.configError("Missing API key.\nSee 'README.md'.")))
 			return
 		}
 
@@ -52,19 +68,16 @@ struct Auth: Codable {
 
 		let task = session.dataTask(with: request) { (data, response, error) in
 			if let error = error {
-				print(error)
-				completion(nil)
+				completion(.failure(error))
 			}
 			else if let data = data {
-				if let text = String(data: data, encoding: .utf8) {
-					print("response: \(text)")
-				}
+				let text = String(data: data, encoding: .utf8) ?? "unknown"
 				if let obj: Auth = try? JSONDecoder().decode(Auth.self, from: data) {
 					let sdkAuth = MoveAuth(userToken: obj.accessToken, refreshToken: obj.refreshToken, userID: obj.userId, projectID: Int64(obj.projectId))
-					completion(sdkAuth)
+					completion(.success(sdkAuth))
 					return
 				}
-				completion(nil)
+				completion(.failure(AuthError.networkError(text)))
 			}
 		}
 		task.resume()

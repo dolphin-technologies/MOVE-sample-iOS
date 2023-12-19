@@ -21,9 +21,18 @@ import DolphinMoveSDK
 
 class SDKStatesMonitor: ObservableObject {
 
-	enum AlertError: String {
-		case networkError = "Network Error!"
-		case configError = "Configuration Mismatch!"
+	enum AlertError: CustomStringConvertible {
+		case networkError(String)
+		case configError
+
+		var description: String {
+			switch self {
+			case let .networkError(text):
+				return "Network Error!\n\(text)"
+			case .configError:
+				return "Configuration Mismatch!"
+			}
+		}
 	}
 
 	/// Reflects SDK logs
@@ -53,8 +62,8 @@ class SDKStatesMonitor: ObservableObject {
 	/// Reflects SDK Failures
 	@Published var failures: [MoveServiceFailure] = []
 
-	func set(alert: AlertError) {
-		alertError = alert.rawValue
+	func set(alert: Error) {
+		alertError = alert.localizedDescription
 	}
 
 	func set(contractID: String) {

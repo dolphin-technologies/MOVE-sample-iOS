@@ -65,7 +65,6 @@ class LocationPermission: Permission {
 	}
 
 	override fileprivate func requestPermission() {
-		print("request location")
 		locationManager.requestAlwaysAuthorization()
 	}
 
