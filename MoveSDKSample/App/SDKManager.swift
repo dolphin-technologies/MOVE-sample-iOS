@@ -176,7 +176,6 @@ class SDKManager {
 	/// Triggers the SDK internal upload queue and reports network errors on failure
 	func performFetch(completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
 		moveSDK.performBackgroundFetch { result in
-			print("processed background fetch \(result)")
 			completionHandler(result)
 		}
 	}
@@ -198,7 +197,6 @@ extension SDKManager {
 	/// Monitors MOVE SDK Serrvice Warnings
 	func sdkWarningListener(_ warnings: [MoveServiceWarning]) {
 		DispatchQueue.main.async {
-			print("warnings: \(warnings)")
 			self.statesMonitor.warnings = warnings
 		}
 	}
@@ -206,7 +204,6 @@ extension SDKManager {
 	/// Monitors MOVE SDK Serrvice Failures
 	func sdkFailureListener(_ failures: [MoveServiceFailure]) {
 		DispatchQueue.main.async {
-			print("failures: \(failures)")
 			self.statesMonitor.failures = failures
 		}
 	}
