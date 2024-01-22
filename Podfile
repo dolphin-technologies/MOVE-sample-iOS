@@ -5,17 +5,14 @@ use_frameworks!
 
 target 'MoveSDKSample' do
 
-	# for requests
-	pod 'Alamofire', '~> 5'
-
 	pod 'AlertToast'
 
-	#	Dolphin Pods
-	pod 'DolphinMoveSDK', '~> 2.6.4'
+	# Dolphin Pods
+	pod 'DolphinMoveSDK', '~> 2.6.7'
 
 end
 
-### The following may be necesssary in Xcode 11 or bellow for compilation for the Simulator
+### The following may be necessary in Xcode 11 or below for compilation for the Simulator
 
 #post_install do |installer|
 #	installer.pods_project.targets.each do |target|
