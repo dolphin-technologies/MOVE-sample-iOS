@@ -1,10 +1,10 @@
 PODS:
   - AlertToast (1.3.7)
-  - DolphinMoveSDK (2.6.9.276)
+  - DolphinMoveSDK (2.10.0.297)
 
 DEPENDENCIES:
   - AlertToast
-  - DolphinMoveSDK (~> 2.6.9)
+  - DolphinMoveSDK (~> 2.10.0.297)
 
 SPEC REPOS:
   trunk:
@@ -13,8 +13,8 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   AlertToast: 8c9d5efb2df6ea728b32b62bce99d876ec3e5393
-  DolphinMoveSDK: ec09d140a6afadc256aa6c7ce3bb50d9c4955111
+  DolphinMoveSDK: 75cd138b9466a36b996bc372d3210fc48a2a4e60
 
-PODFILE CHECKSUM: 841bb88cfcf521cd7c0d7ac57cf62d8820942003
+PODFILE CHECKSUM: f6e610c738bcc55391f0946e9e5679f03d0c3032
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2
