@@ -60,8 +60,12 @@ struct Dashboard: View {
 			.ignoresSafeArea(.all, edges: .bottom)
 			.navigationBarTitle("MOVE.", displayMode: .inline)
 		}
+		.allowsHitTesting(!viewModel.isLoading)
 		.toast(isPresenting: $viewModel.showAlert) {
 			AlertToast(displayMode: .hud, type: .error(.red), title: "Error", subTitle: viewModel.sdkListeners.alertError)
+		}
+		.toast(isPresenting: $viewModel.isLoading) {
+			AlertToast(type: .loading)
 		}
 	}
 }
