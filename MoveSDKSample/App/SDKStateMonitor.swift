@@ -56,6 +56,9 @@ class SDKStatesMonitor: ObservableObject {
 	/// Reflect error messages from SDKManager or the SDK itself.
 	@Published var alertError: String = ""
 
+	/// current error display loading
+	@Published var isLoading: Bool = false
+
 	/// Reflects SDK Warnings
 	@Published var warnings: [MoveServiceWarning] = []
 

@@ -89,37 +89,47 @@ class SDKManager {
 	}
 
 	/// Toggles MOVE SDK Activation State
-	func toggleMoveSDKState() {
-
+	func startAutomaticDetection() {
 		/* Switch on latest state to determine the action */
 		switch moveSDK.getSDKState() {
 		case .uninitialized:
-			registerUserIfNeeded { result in
-				switch result {
-				case let .success(authCode):
-					self.initializeSDK(authCode: authCode) { error in
-						if let error {
-							self.statesMonitor.set(alert: error)
-							self.statesMonitor.state = .uninitialized
-						} else {
-							self.moveSDK.startAutomaticDetection()
-							self.isSDKStarted = true
+				statesMonitor.isLoading = true
+				registerUserIfNeeded { result in
+					switch result {
+					case let .success(authCode):
+						self.initializeSDK(authCode: authCode) { error in
+							self.statesMonitor.isLoading = false
+							if let error {
+								self.statesMonitor.set(alert: error)
+								self.statesMonitor.state = .uninitialized
+								self.isSDKStarted = false
+							} else {
+								self.moveSDK.startAutomaticDetection()
+								self.isSDKStarted = true
+							}
 						}
+					case let .failure(error):
+						self.statesMonitor.isLoading = false
+						/* Inform the monitor with the errors */
+						self.statesMonitor.set(alert: error)
+						self.statesMonitor.state = .uninitialized
+						self.isSDKStarted = false
 					}
-				case let .failure(error):
-					/* Inform the monitor with the errors*/
-					self.statesMonitor.set(alert: error)
-					self.statesMonitor.state = .uninitialized
 				}
-			}
-		case .running:
-			/* Toggle back from running to ready */
-			moveSDK.stopAutomaticDetection()
-			self.isSDKStarted = false
 		case .ready:
 			/* Toggle to running the SDK services */
 			moveSDK.startAutomaticDetection()
 			self.isSDKStarted = true
+		case .running:
+			break
+		}
+	}
+
+	func stopAutomaticDetection() {
+		if moveSDK.getSDKState() == .running {
+			/* Toggle back from running to ready */
+			moveSDK.stopAutomaticDetection()
+			self.isSDKStarted = false
 		}
 	}
 

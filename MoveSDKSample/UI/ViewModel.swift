@@ -21,7 +21,7 @@ import SwiftUI
 import DolphinMoveSDK
 
 class ViewModel: ObservableObject {
-	
+
 	struct Warning: Hashable {
 		let service: String
 		let reasons: [String]
@@ -45,8 +45,13 @@ class ViewModel: ObservableObject {
 	/// current error display state
 	@Published var showAlert: Bool = false
 
+	/// current error display loading
+	@Published var isLoading: Bool = false
+	
+	/// MoveSDK warnings.
 	@Published var warnings: [Warning] = []
 
+	/// MoveSDK errors.
 	@Published var failures: [Warning] = []
 
 	/// Forwards SDKStatesMonitor changes to UI
@@ -58,6 +63,9 @@ class ViewModel: ObservableObject {
 	/// Intercept SDK failures
 	private var sdkFailuresListener: AnyCancellable? = nil
 
+	/// Intercept loading
+	private var loadingListener: AnyCancellable? = nil
+
 	/// Intercept SDK activation state changes to reflect on UI variables
 	private var sdkActivationStateInterceptor: AnyCancellable? = nil
 	
@@ -68,7 +76,11 @@ class ViewModel: ObservableObject {
 	@Published var activationToggle: Bool = SDKManager.shared.isSDKStarted {
 		willSet {
 			if newValue != activationToggle {
-				SDKManager.shared.toggleMoveSDKState()
+				if newValue {
+					SDKManager.shared.startAutomaticDetection()
+				} else {
+					SDKManager.shared.stopAutomaticDetection()
+				}
 			}
 		}
 	}
@@ -86,7 +98,12 @@ class ViewModel: ObservableObject {
 		sdkActivationStateInterceptor = sdkListeners.$state.sink(receiveValue: { newValue in
 			DispatchQueue.main.async {
 				switch newValue {
-				case .uninitialized, .ready:
+				case .uninitialized:
+					if self.activationToggle {
+						self.activationToggle = false
+					}
+					fallthrough
+				case .ready:
 					self.currentStateBGColor1 = Color.stateShutdownBGColor1
 					self.currentStateBGColor2 = Color.stateShutdownBGColor2
 				case .running:
@@ -137,6 +154,13 @@ class ViewModel: ObservableObject {
 		errorsInterceptor = sdkListeners.$alertError.sink(receiveValue: { newValue in
 			DispatchQueue.main.async {
 				self.showAlert = !newValue.isEmpty
+			}
+		})
+
+		/* Track error to set UI toast alert  */
+		loadingListener = sdkListeners.$isLoading.sink(receiveValue: { newValue in
+			DispatchQueue.main.async {
+				self.isLoading = newValue
 			}
 		})
 	}
