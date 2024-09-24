@@ -33,6 +33,10 @@ enum AuthError: Error, LocalizedError {
 }
 
 struct Auth: Codable {
+	struct Response: Decodable {
+		let authCode: String
+	}
+
 	let accessToken: String
 	let refreshToken: String
 	let userId: String
@@ -47,7 +51,7 @@ struct Auth: Codable {
 		return [:]
 	}
 
-	static func registerSDKUser(userID: String, completion: @escaping((Result<MoveAuth, Error>)->())) {
+	static func registerSDKUser(userID: String, completion: @escaping((Result<String, Error>)->())) {
 		guard let bearer = getConfig()["Bearer"], !bearer.isEmpty else {
 			/* Bearer is the API key for authenticating with the the Move SDK.
 			 * You must add the API key in 'Configuration.plist'
@@ -58,13 +62,15 @@ struct Auth: Codable {
 		}
 
 		let session = URLSession.shared
-		let url = URL(string: "https://sdk.dolph.in/v20/auth/register")
-		var request: URLRequest = URLRequest(url: url!)
-
-		request.httpMethod = "POST"
-		request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+		var components = URLComponents(string: "https://sdk.dolph.in/v20/user/authcode")!
+		components.queryItems = [
+			URLQueryItem(name: "userId", value: userID)
+		]
+		var request = URLRequest(url: components.url!)
 		request.addValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
-		request.httpBody = try! JSONSerialization.data(withJSONObject: ["userId": userID], options: [])
+
+		request.httpMethod = "GET"
+		request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
 		let task = session.dataTask(with: request) { (data, response, error) in
 			if let error = error {
@@ -72,12 +78,12 @@ struct Auth: Codable {
 			}
 			else if let data = data {
 				let text = String(data: data, encoding: .utf8) ?? "unknown"
-				if let obj: Auth = try? JSONDecoder().decode(Auth.self, from: data) {
-					let sdkAuth = MoveAuth(userToken: obj.accessToken, refreshToken: obj.refreshToken, userID: obj.userId, projectID: Int64(obj.projectId))
-					completion(.success(sdkAuth))
-					return
+				let obj = try? JSONDecoder().decode(Auth.Response.self, from: data)
+				if let code = obj?.authCode {
+					completion(.success(code))
+				} else {
+					completion(.failure(AuthError.networkError(text)))
 				}
-				completion(.failure(AuthError.networkError(text)))
 			}
 		}
 		task.resume()

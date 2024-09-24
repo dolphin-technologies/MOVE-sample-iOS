@@ -22,6 +22,10 @@ import DolphinMoveSDK
 
 /// Main Interface for managing the MOVE SDK and its services.
 class SDKManager {
+	enum SetupError: Error {
+		case invalidCode(String)
+		case networkError(String)
+	}
 
 	/// SDKManager shared instance.
 	static let shared = SDKManager()
@@ -50,26 +54,17 @@ class SDKManager {
 	let moveSDK: MoveSDK = MoveSDK.shared
 
 	/// MOVE SDK authentication object
-	var auth: MoveAuth? {
+	var userID: String {
 		didSet {
-			
-			/* presist auth*/
-			if let encoded = try? JSONEncoder().encode(auth) {
-				UserDefaults.standard.set(encoded, forKey: "auth")
-			}
+			UserDefaults.standard.set(userID, forKey: "userID")
 		}
 	}
 
 	init() {
 		let decoder = JSONDecoder()
-		/* Decode possibly persisted user auth */
-		if let data: Data = UserDefaults.standard.object(forKey: "auth") as? Data {
-			auth = try? decoder.decode(MoveAuth.self, from: data)
-			if let contractID = auth?.userID {
-				statesMonitor.set(contractID: contractID)
-			}
-		}
-		
+		/* create a random 7 digits user id*/
+		userID = UserDefaults.standard.string(forKey: "userID") ?? Int(Date().timeIntervalSince1970).description.prefix(10).description
+
 		/* Decode possibly persisted isSDKStarted bool */
 		self.isSDKStarted = UserDefaults.standard.bool(forKey: "isSDKStarted")
 	}
@@ -101,10 +96,16 @@ class SDKManager {
 		case .uninitialized:
 			registerUserIfNeeded { result in
 				switch result {
-				case let .success(auth):
-					self.initializeSDK(auth: auth)
-					self.moveSDK.startAutomaticDetection()
-					self.isSDKStarted = true
+				case let .success(authCode):
+					self.initializeSDK(authCode: authCode) { error in
+						if let error {
+							self.statesMonitor.set(alert: error)
+							self.statesMonitor.state = .uninitialized
+						} else {
+							self.moveSDK.startAutomaticDetection()
+							self.isSDKStarted = true
+						}
+					}
 				case let .failure(error):
 					/* Inform the monitor with the errors*/
 					self.statesMonitor.set(alert: error)
@@ -127,28 +128,19 @@ class SDKManager {
 	}
 
 	/// Registers a user if not already registered.
-	func registerUserIfNeeded(completion: @escaping (Result<MoveAuth, Error>)->()){
-		if let auth = auth {
-			completion(.success(auth))
-		} else {
-			/* create a random 7 digits user id*/
-			let userID = Int(Date().timeIntervalSince1970).description.prefix(10).description
-	
-			/* register user and fetch token*/
-			Auth.registerSDKUser(userID: userID) { result in
+	func registerUserIfNeeded(completion: @escaping (Result<String, Error>)->()){
+		/* register user and fetch token*/
+		Auth.registerSDKUser(userID: userID) { result in
+			DispatchQueue.main.async {
 				switch result {
-				case let .success(auth):
-					/* update state monitor with new id for UI*/
-					self.statesMonitor.set(contractID: userID)
-
-					self.auth = auth
-				case .failure(_):
-					break
+				case .success:
+					/* update state monitor with id for UI*/
+					self.statesMonitor.set(contractID: self.userID)
+				case let .failure(error):
+					self.statesMonitor.set(alert: error)
 				}
 
-				DispatchQueue.main.async {
-					completion(result)
-				}
+				completion(result)
 			}
 		}
 	}
@@ -163,14 +155,23 @@ class SDKManager {
 	 2. Prepare MOVE SDK Configurations
 	 3. initialize the SDK's shared instance using `initialize` API
 	*/
-	func initializeSDK(auth: MoveAuth, launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) {
+	func initializeSDK(authCode: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, completion: @escaping (Error?)->()) {
 
 		/* 2.  setup config for allowed SDK services.
 		N.B: Requesting services which are not active on the licensed endpoint will result in config mismatch */
 		let config = MoveConfig(detectionService: [.driving([.drivingBehavior, .distractionFreeDriving]), .cycling, .walking([.location]), .places, .publicTransport, .pointsOfInterest])
 
 		/* 3. Initialize the SDK's shared instance */
-		moveSDK.setup(auth: auth, config: config)
+		moveSDK.setup(authCode: authCode, config: config) { result in
+			switch result {
+			case .success:
+				completion(nil)
+			case let .networkError(error):
+				completion(SetupError.networkError(error))
+			case let .invalidCode(error):
+				completion(SetupError.invalidCode(error))
+			}
+		}
 	}
 
 	/// Triggers the SDK internal upload queue and reports network errors on failure
