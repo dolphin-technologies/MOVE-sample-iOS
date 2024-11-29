@@ -169,7 +169,7 @@ class SDKManager {
 
 		/* 2.  setup config for allowed SDK services.
 		N.B: Requesting services which are not active on the licensed endpoint will result in config mismatch */
-		let config = MoveConfig(detectionService: [.driving([.drivingBehavior, .distractionFreeDriving]), .cycling, .walking([.location]), .places, .publicTransport, .pointsOfInterest])
+		let config = MoveConfig(detectionService: [.driving([.drivingBehavior, .distractionFreeDriving]), .cycling, .publicTransport, .pointsOfInterest])
 
 		/* 3. Initialize the SDK's shared instance */
 		moveSDK.setup(authCode: authCode, config: config) { result in
