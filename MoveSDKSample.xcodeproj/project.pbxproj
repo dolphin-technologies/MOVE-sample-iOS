@@ -12,7 +12,6 @@
 		1BC1818426E109B900B412B9 /* ActivationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC1818326E109B900B412B9 /* ActivationView.swift */; };
 		1BC1818626E10ABD00B412B9 /* StateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC1818526E10ABD00B412B9 /* StateView.swift */; };
 		1BC1818826E10CC400B412B9 /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC1818726E10CC400B412B9 /* CellView.swift */; };
-		458C2CE4FB24EFF3CFA49E94 /* Pods_MoveSDKSample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 036CC3AC11F3B4644E58EFD3 /* Pods_MoveSDKSample.framework */; };
 		AB36BE47269F052B005A6AD2 /* MoveSDKSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB36BE46269F052B005A6AD2 /* MoveSDKSampleApp.swift */; };
 		AB36BE49269F052B005A6AD2 /* Dashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB36BE48269F052B005A6AD2 /* Dashboard.swift */; };
 		AB36BE4B269F0534005A6AD2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB36BE4A269F0534005A6AD2 /* Assets.xcassets */; };
@@ -23,19 +22,18 @@
 		AB79491226A06E1200BDC39C /* Permission.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB79491126A06E1200BDC39C /* Permission.swift */; };
 		AB79491E26A1730400BDC39C /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB79491D26A1730400BDC39C /* Auth.swift */; };
 		AB79492026A17E7800BDC39C /* Configuration.plist in Resources */ = {isa = PBXBuildFile; fileRef = AB79491F26A17E7800BDC39C /* Configuration.plist */; };
+		ABB86B912DA69096008EF919 /* AlertToast in Frameworks */ = {isa = PBXBuildFile; productRef = ABB86B902DA69096008EF919 /* AlertToast */; };
+		ABB86B942DA690B1008EF919 /* DolphinMoveSDK in Frameworks */ = {isa = PBXBuildFile; productRef = ABB86B932DA690B1008EF919 /* DolphinMoveSDK */; };
 		ABBD33A22A5FF54A008F809A /* WarningsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD33A12A5FF54A008F809A /* WarningsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		036CC3AC11F3B4644E58EFD3 /* Pods_MoveSDKSample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MoveSDKSample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		169F35606E7EFEA3EBF9B8A9 /* Pods-MoveSDKSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoveSDKSample.release.xcconfig"; path = "Target Support Files/Pods-MoveSDKSample/Pods-MoveSDKSample.release.xcconfig"; sourceTree = "<group>"; };
 		1B5124D326F90447009BB02B /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		1BA9D74F26B019A7002297CF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		1BA9D75026B183D3002297CF /* SDKStateMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStateMonitor.swift; sourceTree = "<group>"; };
 		1BC1818326E109B900B412B9 /* ActivationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivationView.swift; sourceTree = "<group>"; };
 		1BC1818526E10ABD00B412B9 /* StateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateView.swift; sourceTree = "<group>"; };
 		1BC1818726E10CC400B412B9 /* CellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellView.swift; sourceTree = "<group>"; };
-		2577C7A14F52D8DC89E3A874 /* Pods-MoveSDKSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoveSDKSample.debug.xcconfig"; path = "Target Support Files/Pods-MoveSDKSample/Pods-MoveSDKSample.debug.xcconfig"; sourceTree = "<group>"; };
 		AB36BE43269F052B005A6AD2 /* MoveSDKSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoveSDKSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB36BE46269F052B005A6AD2 /* MoveSDKSampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveSDKSampleApp.swift; sourceTree = "<group>"; };
 		AB36BE48269F052B005A6AD2 /* Dashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dashboard.swift; sourceTree = "<group>"; };
@@ -56,30 +54,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				458C2CE4FB24EFF3CFA49E94 /* Pods_MoveSDKSample.framework in Frameworks */,
+				ABB86B912DA69096008EF919 /* AlertToast in Frameworks */,
+				ABB86B942DA690B1008EF919 /* DolphinMoveSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0336515233294A5B2278A6EB /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				2577C7A14F52D8DC89E3A874 /* Pods-MoveSDKSample.debug.xcconfig */,
-				169F35606E7EFEA3EBF9B8A9 /* Pods-MoveSDKSample.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		AB36BE3A269F052B005A6AD2 = {
 			isa = PBXGroup;
 			children = (
 				1BA9D74F26B019A7002297CF /* README.md */,
 				AB36BE45269F052B005A6AD2 /* MoveSDKSample */,
 				AB36BE44269F052B005A6AD2 /* Products */,
-				0336515233294A5B2278A6EB /* Pods */,
-				CC8DA23CF7C2404FC7A79932 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -147,14 +135,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		CC8DA23CF7C2404FC7A79932 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				036CC3AC11F3B4644E58EFD3 /* Pods_MoveSDKSample.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -162,11 +142,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB36BE52269F0534005A6AD2 /* Build configuration list for PBXNativeTarget "MoveSDKSample" */;
 			buildPhases = (
-				5F455207F81D50FA677EB9B7 /* [CP] Check Pods Manifest.lock */,
 				AB36BE3F269F052B005A6AD2 /* Sources */,
 				AB36BE40269F052B005A6AD2 /* Frameworks */,
 				AB36BE41269F052B005A6AD2 /* Resources */,
-				B663B587325A831DDE4B58D6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -202,6 +180,10 @@
 				Base,
 			);
 			mainGroup = AB36BE3A269F052B005A6AD2;
+			packageReferences = (
+				ABB86B8F2DA69096008EF919 /* XCRemoteSwiftPackageReference "AlertToast" */,
+				ABB86B922DA690B1008EF919 /* XCRemoteSwiftPackageReference "MOVE-iOS-Packages" */,
+			);
 			productRefGroup = AB36BE44269F052B005A6AD2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -223,48 +205,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		5F455207F81D50FA677EB9B7 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-MoveSDKSample-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B663B587325A831DDE4B58D6 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-MoveSDKSample/Pods-MoveSDKSample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-MoveSDKSample/Pods-MoveSDKSample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MoveSDKSample/Pods-MoveSDKSample-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AB36BE3F269F052B005A6AD2 /* Sources */ = {
@@ -409,13 +349,13 @@
 		};
 		AB36BE53269F0534005A6AD2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2577C7A14F52D8DC89E3A874 /* Pods-MoveSDKSample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MoveSDKSample/Preview Content\"";
+				DEVELOPMENT_TEAM = 5P49P82EQF;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = MoveSDKSample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -437,7 +377,6 @@
 		};
 		AB36BE54269F0534005A6AD2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 169F35606E7EFEA3EBF9B8A9 /* Pods-MoveSDKSample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -485,6 +424,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		ABB86B8F2DA69096008EF919 /* XCRemoteSwiftPackageReference "AlertToast" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/elai950/AlertToast";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.9;
+			};
+		};
+		ABB86B922DA690B1008EF919 /* XCRemoteSwiftPackageReference "MOVE-iOS-Packages" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dolphin-technologies/MOVE-iOS-Packages";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		ABB86B902DA69096008EF919 /* AlertToast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ABB86B8F2DA69096008EF919 /* XCRemoteSwiftPackageReference "AlertToast" */;
+			productName = AlertToast;
+		};
+		ABB86B932DA690B1008EF919 /* DolphinMoveSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ABB86B922DA690B1008EF919 /* XCRemoteSwiftPackageReference "MOVE-iOS-Packages" */;
+			productName = DolphinMoveSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AB36BE3B269F052B005A6AD2 /* Project object */;
 }

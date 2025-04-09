@@ -1,0 +1,24 @@
+{
+  "originHash" : "43eb499b53b63a657aac3c5ed0fb44c03282dc9626cb639b3769a880faebc08e",
+  "pins" : [
+    {
+      "identity" : "alerttoast",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/elai950/AlertToast",
+      "state" : {
+        "revision" : "b39252eacd159904afd7d718bba0afabb87f2f2f",
+        "version" : "1.3.9"
+      }
+    },
+    {
+      "identity" : "move-ios-packages",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dolphin-technologies/MOVE-iOS-Packages",
+      "state" : {
+        "revision" : "d9f3d900918690f91e04bf36f73f9a37405c10df",
+        "version" : "2.12.0"
+      }
+    }
+  ],
+  "version" : 3
+}
