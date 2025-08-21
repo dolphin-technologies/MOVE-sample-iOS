@@ -20,6 +20,7 @@ import Combine
 import SwiftUI
 import DolphinMoveSDK
 
+@MainActor
 class ViewModel: ObservableObject {
 
 	struct Warning: Hashable {
@@ -197,13 +198,13 @@ class ViewModel: ObservableObject {
 }
 
 extension Color {
-	static var stateRunningBGColor1 = Color(r: 190, g: 233, b: 105)
-	static var stateRunningBGColor2 = Color(r: 90, g: 145, b: 50)
+	static let stateRunningBGColor1 = Color(r: 190, g: 233, b: 105)
+	static let stateRunningBGColor2 = Color(r: 90, g: 145, b: 50)
 
-	static var stateNotRunningBGColor1 = Color(r: 255, g: 255, b: 136)
-	static var stateNotRunningBGColor2 = Color(r: 255, g: 250, b: 187)
-	static var stateNotRunningBGColor3 = Color(r: 255, g: 187, b: 136)
+	static let stateNotRunningBGColor1 = Color(r: 255, g: 255, b: 136)
+	static let stateNotRunningBGColor2 = Color(r: 255, g: 250, b: 187)
+	static let stateNotRunningBGColor3 = Color(r: 255, g: 187, b: 136)
 
-	static var stateShutdownBGColor1 = Color(r: 243, g: 80, b: 94)
-	static var stateShutdownBGColor2 = Color(r: 160, g: 5, b: 28)
+	static let stateShutdownBGColor1 = Color(r: 243, g: 80, b: 94)
+	static let stateShutdownBGColor2 = Color(r: 160, g: 5, b: 28)
 }

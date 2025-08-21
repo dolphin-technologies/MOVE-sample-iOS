@@ -136,7 +136,9 @@ class MotionPermission: Permission {
 		UserDefaults.standard.set(isPermissionRequested, forKey: isPermissionRequestedKey)
 		requestMotionPermission() { status in
 			self.get(status: status)
-			SDKManager.shared.resolveErrors()
+			MainActor.assumeIsolated {
+				SDKManager.shared.resolveErrors()
+			}
 		}
 	}
 

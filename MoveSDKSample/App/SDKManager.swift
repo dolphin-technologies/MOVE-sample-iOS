@@ -21,6 +21,7 @@ import DolphinMoveSDK
 
 
 /// Main Interface for managing the MOVE SDK and its services.
+@MainActor
 class SDKManager {
 	enum SetupError: Error {
 		case invalidCode(String)
@@ -97,7 +98,7 @@ class SDKManager {
 				registerUserIfNeeded { result in
 					switch result {
 					case let .success(authCode):
-						self.initializeSDK(authCode: authCode) { error in
+						try await self.initializeSDK(authCode: authCode) { error in
 							self.statesMonitor.isLoading = false
 							if let error {
 								self.statesMonitor.set(alert: error)
@@ -165,7 +166,7 @@ class SDKManager {
 	 2. Prepare MOVE SDK Configurations
 	 3. initialize the SDK's shared instance using `initialize` API
 	*/
-	func initializeSDK(authCode: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, completion: @escaping (Error?)->()) {
+	func initializeSDK(authCode: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, continuation: CheckedContinuation<Void, Error>) {
 
 		/* 2.  setup config for allowed SDK services.
 		N.B: Requesting services which are not active on the licensed endpoint will result in config mismatch */
@@ -175,11 +176,11 @@ class SDKManager {
 		moveSDK.setup(authCode: authCode, config: config) { result in
 			switch result {
 			case .success:
-				completion(nil)
+				continuation.resume()
 			case let .networkError(error):
-				completion(SetupError.networkError(error))
+				continuation.resume(throwing: SetupError.networkError(error))
 			case let .invalidCode(error):
-				completion(SetupError.invalidCode(error))
+				continuation.resume(throwing: SetupError.invalidCode(error))
 			}
 		}
 	}
