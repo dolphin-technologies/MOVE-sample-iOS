@@ -98,7 +98,7 @@ class SDKManager {
 				registerUserIfNeeded { result in
 					switch result {
 					case let .success(authCode):
-						try await self.initializeSDK(authCode: authCode) { error in
+						self.initializeSDK(authCode: authCode) { error in
 							self.statesMonitor.isLoading = false
 							if let error {
 								self.statesMonitor.set(alert: error)
@@ -166,7 +166,7 @@ class SDKManager {
 	 2. Prepare MOVE SDK Configurations
 	 3. initialize the SDK's shared instance using `initialize` API
 	*/
-	func initializeSDK(authCode: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, continuation: CheckedContinuation<Void, Error>) {
+	func initializeSDK(authCode: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil, callback: @escaping(Error?)->Void) {
 
 		/* 2.  setup config for allowed SDK services.
 		N.B: Requesting services which are not active on the licensed endpoint will result in config mismatch */
@@ -176,11 +176,11 @@ class SDKManager {
 		moveSDK.setup(authCode: authCode, config: config) { result in
 			switch result {
 			case .success:
-				continuation.resume()
+				callback(nil)
 			case let .networkError(error):
-				continuation.resume(throwing: SetupError.networkError(error))
+				callback(SetupError.networkError(error))
 			case let .invalidCode(error):
-				continuation.resume(throwing: SetupError.invalidCode(error))
+				callback(SetupError.invalidCode(error))
 			}
 		}
 	}
